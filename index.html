@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Clockodo One-Click Week Booking</title>
+	<style>
+		:root {
+			color-scheme: light dark;
+		}
+
+		body {
+			font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+			margin: 16px;
+			line-height: 1.35;
+		}
+
+		h1 {
+			font-size: 18px;
+			margin: 0 0 12px;
+		}
+
+		h2 {
+			font-size: 14px;
+			margin: 16px 0 8px;
+		}
+
+		.row {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			align-items: end;
+		}
+
+		.col {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		label {
+			font-size: 12px;
+			opacity: 0.9;
+		}
+
+		.label-with-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.label-with-link a {
+			font-size: 12px;
+		}
+
+		input,
+		select,
+		button,
+		textarea {
+			font: inherit;
+			padding: 6px 8px;
+		}
+
+		input[type="time"] {
+			padding: 4px 6px;
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 90px;
+		}
+
+		button {
+			cursor: pointer;
+		}
+
+		button[disabled] {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+
+		.card {
+			position: relative;
+			border: 1px solid rgba(128, 128, 128, 0.35);
+			border-radius: 8px;
+			padding: 12px;
+			margin: 12px 0;
+		}
+
+		.card-cog-btn {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 30px;
+			height: 30px;
+			padding: 0;
+			border: 1px solid rgba(128, 128, 128, 0.35);
+			border-radius: 6px;
+			background: transparent;
+		}
+
+		.card-cog-btn svg {
+			width: 16px;
+			height: 16px;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.grid {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.grid th,
+		.grid td {
+			border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+			padding: 8px;
+			vertical-align: top;
+		}
+
+		.grid th {
+			text-align: left;
+			font-size: 12px;
+			opacity: 0.9;
+		}
+
+		.mono {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 12px;
+			white-space: pre-wrap;
+		}
+
+		.muted {
+			opacity: 0.85;
+			font-size: 12px;
+		}
+
+		.error {
+			color: #b00020;
+		}
+
+		.ok {
+			color: #0b6b0b;
+		}
+
+		.small {
+			font-size: 12px;
+		}
+
+		.pill {
+			display: inline-block;
+			padding: 2px 6px;
+			border: 1px solid rgba(128, 128, 128, 0.35);
+			border-radius: 999px;
+			font-size: 12px;
+		}
+
+		.right {
+			text-align: right;
+		}
+
+		.w-160 {
+			width: 160px;
+		}
+
+		.w-280 {
+			width: 280px;
+		}
+
+		.w-90 {
+			width: 90px;
+		}
+
+		.w-110 {
+			width: 110px;
+		}
+
+		.segment-editor {
+			flex-wrap: nowrap;
+			align-items: flex-start;
+		}
+
+		.segment-editor input[type="checkbox"] {
+			margin-top: 6px;
+		}
+
+		.track-toggle-cell {
+			text-align: center;
+			vertical-align: middle !important;
+		}
+
+		.track-toggle-cell input[type="checkbox"] {
+			transform: scale(1.1);
+			display: block;
+			margin: 0 auto;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Clockodo One-Click Week Booking</h1>
+	<div class="muted">Books two work segments per weekday (break is the gap). Also fetches actual booked work
+		intervals.</div>
+
+	<div class="card" id="connectionCard">
+		<button class="card-cog-btn" type="button" aria-label="Toggle connection card">
+			<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" stroke="currentColor" stroke-width="1.6" />
+				<path
+					d="M20 13.2v-2.4l-2-.7a6 6 0 0 0-.4-1l.9-1.9-1.7-1.7-1.9.9a6 6 0 0 0-1-.4L13.2 4h-2.4l-.7 2a6 6 0 0 0-1 .4l-1.9-.9-1.7 1.7.9 1.9a6 6 0 0 0-.4 1l-2 .7v2.4l2 .7c.1.3.2.7.4 1l-.9 1.9 1.7 1.7 1.9-.9c.3.2.7.3 1 .4l.7 2h2.4l.7-2c.3-.1.7-.2 1-.4l1.9.9 1.7-1.7-.9-1.9c.2-.3.3-.7.4-1l2-.7Z"
+					stroke="currentColor" stroke-width="1.6" />
+			</svg>
+		</button>
+		<h2>Connection</h2>
+		<div class="row">
+			<div class="col">
+				<label for="apiUser">Clockodo email</label>
+				<input id="apiUser" class="w-280" type="email" autocomplete="username" placeholder="you@company.com" />
+			</div>
+			<div class="col">
+				<label for="apiKey">API key <a id="apiKeyGetKeyLink" href="https://my.clockodo.com/de/users/editself/" target="_blank" rel="noopener noreferrer" class="hidden">(get key)</a></label>
+				<input id="apiKey" class="w-280" type="password" autocomplete="current-password"
+					placeholder="••••••••" />
+			</div>
+			<div class="col">
+				<label for="customerId" class="label-with-link">Customer ID <a id="customerIdEditLink" href="#">(edit)</a></label>
+				<input id="customerId" class="w-110" type="text" inputmode="numeric" placeholder="Customer ID" title="Already set, edit if needed" disabled />
+			</div>
+			<div class="col">
+				<label for="serviceId" class="label-with-link">Service ID <a id="serviceIdEditLink" href="#">(edit)</a></label>
+				<input id="serviceId" class="w-110" type="text" inputmode="numeric" placeholder="Service ID" title="Already set, edit if needed" disabled />
+			</div>
+			<div class="col">
+				<button id="btnTestConnection">Test connection</button>
+			</div>
+		</div>
+		<div class="row" style="margin-top:8px;">
+			<div class="col" style="flex:1; min-width:320px;">
+				<div id="connectionStatus" class="small"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card">
+		<button class="card-cog-btn" type="button" aria-label="Toggle connection card">
+			<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" stroke="currentColor" stroke-width="1.6" />
+				<path
+					d="M20 13.2v-2.4l-2-.7a6 6 0 0 0-.4-1l.9-1.9-1.7-1.7-1.9.9a6 6 0 0 0-1-.4L13.2 4h-2.4l-.7 2a6 6 0 0 0-1 .4l-1.9-.9-1.7 1.7.9 1.9a6 6 0 0 0-.4 1l-2 .7v2.4l2 .7c.1.3.2.7.4 1l-.9 1.9 1.7 1.7 1.9-.9c.3.2.7.3 1 .4l.7 2h2.4l.7-2c.3-.1.7-.2 1-.4l1.9.9 1.7-1.7-.9-1.9c.2-.3.3-.7.4-1l2-.7Z"
+					stroke="currentColor" stroke-width="1.6" />
+			</svg>
+		</button>
+		<h2>Week</h2>
+		<div class="row">
+			<div class="col">
+				<label for="weekOf">Any date in the week</label>
+				<input id="weekOf" type="date" class="w-160" />
+			</div>
+			<div class="col">
+				<label>&nbsp;</label>
+				<button id="btnSaveSettings">Save settings</button>
+			</div>
+			<div class="col">
+				<label id="week-total-label">Total (0:00 h)</label>
+				<button id="btnBookWeek">Book whole week</button>
+			</div>
+			<div class="col">
+				<label>&nbsp;</label>
+				<button id="btnRefreshBooked">Refresh booked times</button>
+			</div>
+			<div class="col" style="flex:1; min-width:220px;">
+				<div class="right muted small" id="userBadge"></div>
+			</div>
+		</div>
+
+		<div style="margin-top:10px; overflow:auto;">
+			<table class="grid" id="weekTable">
+				<thead>
+					<tr>
+						<th style="min-width:160px;">Day</th>
+						<th style="min-width:90px;">Track all</th>
+						<th>Work segment 1</th>
+						<th>Work segment 2 (after break)</th>
+						<th style="min-width:190px;">Actions</th>
+						<th id="bookedHeader" style="min-width:260px;">Booked (0:00 h)</th>
+					</tr>
+				</thead>
+				<tbody id="weekBody"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Log</h2>
+		<div id="log" class="mono"></div>
+	</div>
+
+	<script>
+		(function () {
+			'use strict';
+
+			const STORAGE_KEY = 'clockodo.oneClick.v1';
+			const API_BASE = 'https://my.clockodo.com/api';
+			const EXTERNAL_APP_HEADER = 'ClockodoOneClick;tech@example.com';
+			const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+			const DAY_LABELS = {
+				monday: 'Monday',
+				tuesday: 'Tuesday',
+				wednesday: 'Wednesday',
+				thursday: 'Thursday',
+				friday: 'Friday',
+			};
+
+			const el = {
+				connectionCard: document.getElementById('connectionCard'),
+				apiUser: document.getElementById('apiUser'),
+				apiKey: document.getElementById('apiKey'),
+				apiKeyGetKeyLink: document.getElementById('apiKeyGetKeyLink'),
+				customerId: document.getElementById('customerId'),
+				customerIdEditLink: document.getElementById('customerIdEditLink'),
+				serviceId: document.getElementById('serviceId'),
+				serviceIdEditLink: document.getElementById('serviceIdEditLink'),
+				btnSaveSettings: document.getElementById('btnSaveSettings'),
+				btnTestConnection: document.getElementById('btnTestConnection'),
+				connectionStatus: document.getElementById('connectionStatus'),
+				weekOf: document.getElementById('weekOf'),
+				weekTotalLabel: document.getElementById('week-total-label'),
+				btnBookWeek: document.getElementById('btnBookWeek'),
+				btnRefreshBooked: document.getElementById('btnRefreshBooked'),
+				chkSkipIfExists: document.getElementById('chkSkipIfExists'),
+				chkLoadPicklists: document.getElementById('chkLoadPicklists'),
+				weekBody: document.getElementById('weekBody'),
+				bookedHeader: document.getElementById('bookedHeader'),
+				log: document.getElementById('log'),
+				userBadge: document.getElementById('userBadge'),
+			};
+
+			/** @type {{settings:any, me:any|null, bookedByDate: Record<string, any>}} */
+			const state = {
+				settings: null,
+				me: null,
+				bookedByDate: {},
+				nonbusinessByDate: {},
+				nonbusinessByYear: {},
+			};
+
+			function defaultDayTemplate() {
+				return {
+					segments: [
+						{ since: '08:00', until: '12:00', enabled: true },
+						{ since: '13:00', until: '17:00', enabled: true },
+					],
+				};
+			}
+
+			function defaultSettings() {
+				const weekTemplate = {};
+				for (const key of DAY_KEYS) weekTemplate[key] = defaultDayTemplate();
+				return {
+					apiUser: '',
+					apiKey: '',
+					customerId: '4821928',
+					serviceId: '1576696',
+					language: 'en',
+					skipIfExists: true,
+					loadPicklists: false,
+					weekTemplate,
+				};
+			}
+
+			function loadSettings() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					if (!raw) return defaultSettings();
+					const parsed = JSON.parse(raw);
+					const merged = defaultSettings();
+					Object.assign(merged, parsed);
+					merged.weekTemplate = merged.weekTemplate || {};
+					for (const key of DAY_KEYS) {
+						merged.weekTemplate[key] = Object.assign(defaultDayTemplate(), merged.weekTemplate[key] || {});
+						merged.weekTemplate[key].segments = (merged.weekTemplate[key].segments || defaultDayTemplate().segments).map((s, i) => ({
+							since: (s && s.since) || (i === 0 ? '08:00' : '13:00'),
+							until: (s && s.until) || (i === 0 ? '12:00' : '17:00'),
+							enabled: typeof (s && s.enabled) === 'boolean' ? s.enabled : true,
+						}));
+						if (merged.weekTemplate[key].segments.length < 2) {
+							merged.weekTemplate[key].segments = defaultDayTemplate().segments;
+						}
+					}
+					return merged;
+				} catch {
+					return defaultSettings();
+				}
+			}
+
+			function saveSettings(next, persist = false) {
+				state.settings = next;
+				if (persist) {
+					localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+				}
+			}
+
+			function setStatus(html, kind) {
+				el.connectionStatus.innerHTML = html;
+				el.connectionStatus.className = 'small ' + (kind === 'error' ? 'error' : kind === 'ok' ? 'ok' : '');
+			}
+
+			function appendLog(line) {
+				const now = new Date();
+				const ts = now.toLocaleString();
+				el.log.textContent += `[${ts}] ${line}\n`;
+			}
+
+			function clearLog() {
+				el.log.textContent = '';
+			}
+
+			function sleep(ms) {
+				return new Promise((r) => setTimeout(r, ms));
+			}
+
+			function apiHeaders() {
+				const s = state.settings;
+				return {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json',
+					'Accept-Language': s.language || 'en',
+					'X-ClockodoApiUser': s.apiUser,
+					'X-ClockodoApiKey': s.apiKey,
+					'X-Clockodo-External-Application': EXTERNAL_APP_HEADER,
+				};
+			}
+
+			async function fetchJson(path, { method = 'GET', body = undefined, query = undefined, retries = 3 } = {}) {
+				const base = API_BASE;
+				let url = base + path;
+				if (query && typeof query === 'object') {
+					const params = new URLSearchParams();
+					for (const [k, v] of Object.entries(query)) {
+						if (v === undefined || v === null || v === '') continue;
+						params.set(k, String(v));
+					}
+					const qs = params.toString();
+					if (qs) url += (url.includes('?') ? '&' : '?') + qs;
+				}
+
+				let attempt = 0;
+				while (true) {
+					attempt++;
+					try {
+						const res = await fetch(url, {
+							method,
+							headers: apiHeaders(),
+							body: body !== undefined ? JSON.stringify(body) : undefined,
+						});
+						const text = await res.text();
+						let data;
+						try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+						if (res.status === 429 && attempt <= retries) {
+							const backoff = Math.min(8000, 500 * Math.pow(2, attempt));
+							appendLog(`Rate limited (429). Retrying in ${backoff}ms...`);
+							await sleep(backoff);
+							continue;
+						}
+
+						if (!res.ok) {
+							const msg = typeof data === 'string' ? data : JSON.stringify(data);
+							const err = new Error(`HTTP ${res.status} ${res.statusText}: ${msg}`);
+							// @ts-ignore
+							err.status = res.status;
+							throw err;
+						}
+						return data;
+					} catch (e) {
+						// CORS/network errors show up here with TypeError in browsers
+						if (attempt <= retries && isRetryableNetworkError(e)) {
+							const backoff = Math.min(8000, 500 * Math.pow(2, attempt));
+							appendLog(`Network/CORS error. Retrying in ${backoff}ms...`);
+							await sleep(backoff);
+							continue;
+						}
+						throw e;
+					}
+				}
+			}
+
+			function isRetryableNetworkError(e) {
+				if (!e) return false;
+				const msg = String(e && e.message ? e.message : e);
+				return msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed');
+			}
+
+			function parseDateInput(dateStr) {
+				// YYYY-MM-DD
+				const m = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(dateStr || '');
+				if (!m) return null;
+				return { y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) };
+			}
+
+			function toIsoNoMillis(date) {
+				// Clockodo appears to validate ISO 8601 strictly and may reject milliseconds.
+				// Convert e.g. 2026-03-11T07:30:00.000Z -> 2026-03-11T07:30:00Z
+				return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+			}
+
+			function localDateTimeToUtcIso(dateStr, timeStr) {
+				const p = parseDateInput(dateStr);
+				if (!p) throw new Error('Invalid date');
+				const tm = /^([0-9]{2}):([0-9]{2})$/.exec(timeStr || '');
+				if (!tm) throw new Error('Invalid time');
+				const dt = new Date(p.y, p.mo - 1, p.d, Number(tm[1]), Number(tm[2]), 0, 0);
+				return toIsoNoMillis(dt);
+			}
+
+			function localDateMidnightUtcIso(dateStr) {
+				const p = parseDateInput(dateStr);
+				if (!p) throw new Error('Invalid date');
+				return toIsoNoMillis(new Date(p.y, p.mo - 1, p.d, 0, 0, 0, 0));
+			}
+
+			function addDays(dateObj, days) {
+				const dt = new Date(dateObj.getTime());
+				dt.setDate(dt.getDate() + days);
+				return dt;
+			}
+
+			function addDaysToDateStr(dateStr, days) {
+				const p = parseDateInput(dateStr);
+				if (!p) throw new Error('Invalid date');
+				const dt = new Date(p.y, p.mo - 1, p.d, 12, 0, 0, 0);
+				dt.setDate(dt.getDate() + days);
+				return formatDateLocal(dt);
+			}
+
+			function formatDateLocal(dateObj) {
+				const y = dateObj.getFullYear();
+				const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+				const d = String(dateObj.getDate()).padStart(2, '0');
+				return `${y}-${m}-${d}`;
+			}
+
+			function formatDateDisplay(dateObj) {
+				return dateObj.toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+			}
+
+			function startOfWeekMonday(anyDate) {
+				const dt = new Date(anyDate.getFullYear(), anyDate.getMonth(), anyDate.getDate(), 12, 0, 0, 0);
+				const day = dt.getDay(); // 0..6 (Sun..Sat)
+				const diff = (day === 0 ? -6 : 1 - day); // move to Monday
+				dt.setDate(dt.getDate() + diff);
+				dt.setHours(12, 0, 0, 0);
+				return dt;
+			}
+
+			function toLocalTimeHHMM(isoUtc) {
+				const dt = new Date(isoUtc);
+				const h = String(dt.getHours()).padStart(2, '0');
+				const m = String(dt.getMinutes()).padStart(2, '0');
+				return `${h}:${m}`;
+			}
+
+			async function testConnection() {
+				setStatus('Testing connection...', '');
+				try {
+					const me = await fetchJson('/v4/users/me', { retries: 1 });
+					state.me = me && me.data ? me.data : me.user || me;
+					renderUserBadge();
+					setStatus(`OK. Logged in as <b>${escapeHtml(state.me.email || '(unknown)')}</b> (user id ${escapeHtml(String(state.me.id || ''))}).`, 'ok');
+					appendLog('Connection OK.');
+					return true;
+				} catch (e) {
+					const msg = String(e && e.message ? e.message : e);
+					appendLog(`Connection failed: ${msg}`);
+					setStatus(
+						`Connection failed.<br/>
+							 <div class="small">Error: <span class="mono">${escapeHtml(msg)}</span></div>`,
+						'error'
+					);
+					return false;
+				}
+			}
+
+			function escapeHtml(s) {
+				return String(s)
+					.replaceAll('&', '&amp;')
+					.replaceAll('<', '&lt;')
+					.replaceAll('>', '&gt;')
+					.replaceAll('"', '&quot;')
+					.replaceAll("'", '&#39;');
+			}
+
+			function renderUserBadge() {
+				if (!state.me) {
+					el.userBadge.textContent = '';
+					return;
+				}
+				const name = state.me.name || state.me.email || 'Me';
+				el.userBadge.textContent = `${name} (id ${state.me.id})`;
+			}
+
+			function getSelectedWeekMonday() {
+				const p = parseDateInput(el.weekOf.value);
+				if (!p) {
+					const today = new Date();
+					return startOfWeekMonday(today);
+				}
+				const any = new Date(p.y, p.mo - 1, p.d, 12, 0, 0, 0);
+				return startOfWeekMonday(any);
+			}
+
+			function parseHHMMToMinutes(value) {
+				const m = /^([0-9]{2}):([0-9]{2})$/.exec(String(value || ''));
+				if (!m) return null;
+				const h = Number(m[1]);
+				const min = Number(m[2]);
+				if (h < 0 || h > 23 || min < 0 || min > 59) return null;
+				return h * 60 + min;
+			}
+
+			function totalMinutesForDay(tpl) {
+				if (!tpl || !Array.isArray(tpl.segments)) return 0;
+				let total = 0;
+				for (const seg of tpl.segments) {
+					if (seg && seg.enabled === false) continue;
+					if (!seg || !seg.since || !seg.until) continue;
+					const since = parseHHMMToMinutes(seg.since);
+					const until = parseHHMMToMinutes(seg.until);
+					if (since === null || until === null || until <= since) continue;
+					total += (until - since);
+				}
+				return total;
+			}
+
+			function intervalOverlaps(startA, endA, startB, endB) {
+				return startA < endB && startB < endA;
+			}
+
+			function segmentOverlapsBooked(dateStr, seg) {
+				if (!seg || !seg.since || !seg.until) return false;
+				const segSince = parseHHMMToMinutes(seg.since);
+				const segUntil = parseHHMMToMinutes(seg.until);
+				if (segSince === null || segUntil === null || segUntil <= segSince) return false;
+				const day = state.bookedByDate[dateStr];
+				const intervals = day && Array.isArray(day.intervals) ? day.intervals : [];
+				for (const it of intervals) {
+					const bookedSince = parseHHMMToMinutes(toLocalTimeHHMM(it.time_since));
+					const bookedUntil = parseHHMMToMinutes(toLocalTimeHHMM(it.time_until));
+					if (bookedSince === null || bookedUntil === null || bookedUntil <= bookedSince) continue;
+					if (intervalOverlaps(segSince, segUntil, bookedSince, bookedUntil)) return true;
+				}
+				return false;
+			}
+
+			function applyOverlapSelectionsForCurrentWeek() {
+				const monday = getSelectedWeekMonday();
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dayKey = DAY_KEYS[i];
+					const dateStr = formatDateLocal(addDays(monday, i));
+					const tpl = state.settings.weekTemplate[dayKey];
+					if (!tpl || !Array.isArray(tpl.segments)) continue;
+					for (const seg of tpl.segments) {
+						if (!seg) continue;
+						if (segmentOverlapsBooked(dateStr, seg)) {
+							seg.enabled = false;
+						}
+					}
+				}
+			}
+
+			function totalMinutesForWeek() {
+				let total = 0;
+				for (const dayKey of DAY_KEYS) {
+					total += totalMinutesForDay(state.settings.weekTemplate[dayKey]);
+				}
+				return total;
+			}
+
+			function formatMinutesAsHours(totalMinutes) {
+				const hours = Math.floor(totalMinutes / 60);
+				const minutes = totalMinutes % 60;
+				return `${hours}:${String(minutes).padStart(2, '0')} h`;
+			}
+
+			function updateDayTotalLabel(dayKey) {
+				const node = document.getElementById(`day-total-label-${dayKey}`);
+				if (!node) return;
+				const tpl = state.settings.weekTemplate[dayKey];
+				const minutes = totalMinutesForDay(tpl);
+				node.textContent = `Total (${formatMinutesAsHours(minutes)})`;
+			}
+
+			function updateBookWeekButtonLabel() {
+				const minutes = totalMinutesForWeek();
+				if (el.weekTotalLabel) {
+					el.weekTotalLabel.textContent = `Total (${formatMinutesAsHours(minutes)})`;
+				}
+				el.btnBookWeek.textContent = 'Book whole week';
+			}
+
+			function renderWeek() {
+				const monday = getSelectedWeekMonday();
+				const settings = state.settings;
+				el.weekBody.innerHTML = '';
+
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dayKey = DAY_KEYS[i];
+					const dt = addDays(monday, i);
+					const dateStr = formatDateLocal(dt);
+					const dateDisplay = formatDateDisplay(dt);
+					const tpl = settings.weekTemplate[dayKey];
+					const isNonbusinessDay = !!(state.nonbusinessByDate[dateStr] && state.nonbusinessByDate[dateStr].length);
+
+					const tr = document.createElement('tr');
+					tr.dataset.dayKey = dayKey;
+					tr.dataset.date = dateStr;
+
+					const tdDay = document.createElement('td');
+					tdDay.innerHTML = `<div><b>${DAY_LABELS[dayKey]}</b></div><div class="muted">${dateDisplay}</div>`;
+					tr.appendChild(tdDay);
+
+					const tdTrackDay = document.createElement('td');
+					tdTrackDay.className = 'track-toggle-cell';
+					const dayToggle = document.createElement('input');
+					dayToggle.type = 'checkbox';
+					dayToggle.checked = !isNonbusinessDay && tpl.segments.every((seg) => !seg || seg.enabled !== false);
+					dayToggle.disabled = isNonbusinessDay;
+					dayToggle.addEventListener('change', () => {
+						const enabled = dayToggle.checked;
+						for (const segment of state.settings.weekTemplate[dayKey].segments) {
+							if (!segment) continue;
+							segment.enabled = enabled;
+						}
+						saveSettings(state.settings);
+						renderWeek();
+					});
+					tdTrackDay.appendChild(dayToggle);
+					tr.appendChild(tdTrackDay);
+
+					const tdSeg1 = document.createElement('td');
+					tdSeg1.appendChild(buildSegmentEditor(dayKey, 0, tpl.segments[0], {
+						disableTrackToggle: isNonbusinessDay,
+					}));
+					tr.appendChild(tdSeg1);
+
+					const tdSeg2 = document.createElement('td');
+					tdSeg2.appendChild(buildSegmentEditor(dayKey, 1, tpl.segments[1], {
+						disableTrackToggle: isNonbusinessDay,
+					}));
+					tr.appendChild(tdSeg2);
+
+					const tdActions = document.createElement('td');
+					const actionsWrap = document.createElement('div');
+					actionsWrap.className = 'col';
+					const totalLabel = document.createElement('label');
+					totalLabel.id = `day-total-label-${dayKey}`;
+					totalLabel.textContent = `Total (${formatMinutesAsHours(totalMinutesForDay(tpl))})`;
+					actionsWrap.appendChild(totalLabel);
+					const btn = document.createElement('button');
+					btn.textContent = 'Book day';
+					btn.addEventListener('click', () => bookDay(dayKey, dateStr));
+					actionsWrap.appendChild(btn);
+					tdActions.appendChild(actionsWrap);
+					tr.appendChild(tdActions);
+
+					const tdBooked = document.createElement('td');
+					tdBooked.id = `booked-${dayKey}`;
+					tdBooked.appendChild(renderBookedCell(dateStr));
+					tr.appendChild(tdBooked);
+
+					el.weekBody.appendChild(tr);
+				}
+
+				updateBookWeekButtonLabel();
+			}
+
+			function buildSegmentEditor(dayKey, idx, seg, options = {}) {
+				const disableTrackToggle = !!options.disableTrackToggle;
+				const wrap = document.createElement('div');
+				wrap.className = 'row segment-editor';
+				const col1 = document.createElement('div');
+				col1.className = 'col';
+				const col2 = document.createElement('div');
+				col2.className = 'col';
+				const col3 = document.createElement('div');
+				col3.className = 'col';
+				const since = document.createElement('input');
+				since.type = 'time';
+				since.className = 'w-110';
+				since.value = seg.since || '';
+				since.addEventListener('change', () => {
+					state.settings.weekTemplate[dayKey].segments[idx].since = since.value;
+					saveSettings(state.settings);
+					updateDayTotalLabel(dayKey);
+					updateBookWeekButtonLabel();
+				});
+				const until = document.createElement('input');
+				until.type = 'time';
+				until.className = 'w-110';
+				until.value = seg.until || '';
+				until.addEventListener('change', () => {
+					state.settings.weekTemplate[dayKey].segments[idx].until = until.value;
+					saveSettings(state.settings);
+					updateDayTotalLabel(dayKey);
+					updateBookWeekButtonLabel();
+				});
+				const enabled = document.createElement('input');
+				enabled.type = 'checkbox';
+				enabled.checked = seg.enabled !== false;
+				enabled.disabled = !!disableTrackToggle;
+				enabled.addEventListener('change', () => {
+					state.settings.weekTemplate[dayKey].segments[idx].enabled = enabled.checked;
+					saveSettings(state.settings);
+					updateDayTotalLabel(dayKey);
+					updateBookWeekButtonLabel();
+					renderWeek();
+				});
+				col1.appendChild(labelled('Since', since));
+				col2.appendChild(labelled('Until', until));
+				col3.appendChild(labelled('Track', enabled));
+				wrap.appendChild(col1);
+				wrap.appendChild(col2);
+				wrap.appendChild(col3);
+				return wrap;
+			}
+
+			function labelled(labelText, inputEl) {
+				const box = document.createElement('div');
+				box.className = 'col';
+				const lab = document.createElement('label');
+				lab.textContent = labelText;
+				box.appendChild(lab);
+				box.appendChild(inputEl);
+				return box;
+			}
+
+			function renderBookedCell(dateStr) {
+				const box = document.createElement('div');
+				const day = state.bookedByDate[dateStr];
+				const nonbusinessDays = Array.isArray(state.nonbusinessByDate[dateStr]) ? state.nonbusinessByDate[dateStr] : [];
+				const nonbusinessNames = [...new Set(nonbusinessDays
+					.map((d) => d && d.name ? String(d.name).trim() : '')
+					.filter((name) => !!name))];
+				if (!day) {
+					if (nonbusinessNames.length) {
+						box.innerHTML = `<span class="muted">${escapeHtml(nonbusinessNames.join(', '))}</span>`;
+						return box;
+					}
+					box.innerHTML = '<span class="muted">(not loaded)</span>';
+					return box;
+				}
+				const intervals = day.intervals || [];
+				if (!intervals.length) {
+					if (nonbusinessNames.length) {
+						box.innerHTML = `<div class="small muted">${escapeHtml(nonbusinessNames.join(', '))}</div><div class="small muted">No intervals</div>`;
+					} else {
+						box.innerHTML = '<span class="muted">No intervals</span>';
+					}
+					return box;
+				}
+				const lines = intervals.map((it) => `${toLocalTimeHHMM(it.time_since)}–${toLocalTimeHHMM(it.time_until)}`);
+				const totalMinutes = intervals.reduce((sum, it) => {
+					const since = new Date(it.time_since);
+					const until = new Date(it.time_until);
+					const delta = Math.max(0, Math.round((until - since) / 60000));
+					return sum + delta;
+				}, 0);
+				const nonbusinessHtml = nonbusinessNames.length
+					? `<div class="small muted">${escapeHtml(nonbusinessNames.join(', '))}</div>`
+					: '';
+				box.innerHTML = `${nonbusinessHtml}<div class="small">${lines.map(escapeHtml).join('<br/>')}</div><div class="small muted">(${escapeHtml(formatMinutesAsHours(totalMinutes))})</div>`;
+				return box;
+			}
+
+			function updateBookedCells() {
+				const monday = getSelectedWeekMonday();
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dt = addDays(monday, i);
+					const dateStr = formatDateLocal(dt);
+					const dayKey = DAY_KEYS[i];
+					const td = document.getElementById(`booked-${dayKey}`);
+					if (!td) continue;
+					td.innerHTML = '';
+					td.appendChild(renderBookedCell(dateStr));
+				}
+				updateBookedHeaderLabel();
+			}
+
+			function updateBookedHeaderLabel() {
+				if (!el.bookedHeader) return;
+				const monday = getSelectedWeekMonday();
+				let totalMinutes = 0;
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dateStr = formatDateLocal(addDays(monday, i));
+					const day = state.bookedByDate[dateStr];
+					const intervals = day && Array.isArray(day.intervals) ? day.intervals : [];
+					for (const it of intervals) {
+						const since = new Date(it.time_since);
+						const until = new Date(it.time_until);
+						totalMinutes += Math.max(0, Math.round((until - since) / 60000));
+					}
+				}
+				el.bookedHeader.textContent = `Booked (${formatMinutesAsHours(totalMinutes)})`;
+			}
+
+			function validateDayTemplate(tpl) {
+				const enabledSegments = (tpl.segments || []).filter((s) => s && s.enabled !== false);
+				for (let i = 0; i < enabledSegments.length; i++) {
+					const seg = enabledSegments[i];
+					if (!seg.since || !seg.until) throw new Error(`Segment ${i + 1} must have since/until`);
+					if (!isTimeOrdered(seg.since, seg.until)) throw new Error(`Segment ${i + 1}: since must be before until`);
+				}
+				if (enabledSegments.length > 1) {
+					const first = enabledSegments[0];
+					const second = enabledSegments[1];
+					if (!isTimeOrdered(first.until, second.since) && first.until !== second.since) throw new Error('Segments overlap (segment 2 must start after segment 1 ends)');
+				}
+
+				if (!state.settings.customerId || !state.settings.serviceId) throw new Error('Customer ID and Service ID are required');
+			}
+
+			function isTimeOrdered(a, b) {
+				// HH:MM
+				return String(a) < String(b);
+			}
+
+			async function ensureConnection() {
+				if (state.me && state.me.id) return true;
+				return await testConnection();
+			}
+
+			async function dayHasAnyEntry(dateStr) {
+				if (!state.me || !state.me.id) return false;
+				const start = localDateMidnightUtcIso(dateStr);
+				const end = localDateMidnightUtcIso(addDaysToDateStr(dateStr, 1));
+				const data = await fetchJson('/v2/entries', {
+					query: {
+						time_since: start,
+						time_until: end,
+						'filter[users_id]': state.me.id,
+						items_per_page: 1000,
+						page: 1,
+					},
+					retries: 1,
+				});
+				const entries = Array.isArray(data.entries) ? data.entries : [];
+				return entries.length > 0;
+			}
+
+			async function createEntry({ customerId, serviceId, dateStr, seg }) {
+				const body = {
+					customers_id: Number(customerId),
+					services_id: Number(serviceId),
+					billable: 0,
+					time_since: localDateTimeToUtcIso(dateStr, seg.since),
+					time_until: localDateTimeToUtcIso(dateStr, seg.until),
+				};
+				const data = await fetchJson('/v2/entries', { method: 'POST', body, retries: 2 });
+				return data;
+			}
+
+			async function bookDay(dayKey, dateStr) {
+				clearLog();
+				updateBookedHeaderLabel();
+				appendLog(`Booking ${DAY_LABELS[dayKey]} (${dateStr})...`);
+
+				const ok = await ensureConnection();
+				if (!ok) return;
+
+				const tpl = state.settings.weekTemplate[dayKey];
+				try {
+					validateDayTemplate(tpl);
+				} catch (e) {
+					appendLog(`Validation error: ${String(e.message || e)}`);
+					return;
+				}
+
+				const segments = tpl.segments.filter((s) => s && s.enabled !== false && s.since && s.until);
+				if (!segments.length) {
+					appendLog('Nothing to book: no enabled segments.');
+					return;
+				}
+
+				for (let i = 0; i < segments.length; i++) {
+					const seg = segments[i];
+					appendLog(`Creating entry ${i + 1}/${segments.length}: ${seg.since}–${seg.until}...`);
+					try {
+						const res = await createEntry({
+							customerId: state.settings.customerId,
+							serviceId: state.settings.serviceId,
+							dateStr,
+							seg,
+						});
+						const entry = res && res.entry ? res.entry : res.data ? res.data : null;
+						const entryId = entry && entry.id ? entry.id : '(unknown id)';
+						appendLog(`Created entry id ${entryId}.`);
+					} catch (e) {
+						appendLog(`Failed to create entry: ${String(e.message || e)}`);
+						return;
+					}
+					await sleep(250);
+				}
+
+				appendLog('Done. Refreshing booked times...');
+				await refreshBookedTimes({ preserveLog: true });
+			}
+
+			async function bookWeek() {
+				clearLog();
+				appendLog('Booking whole week (Mon–Fri)...');
+				const ok = await ensureConnection();
+				if (!ok) return;
+
+				const monday = getSelectedWeekMonday();
+				const summary = { booked: 0, skipped: 0, failed: 0 };
+
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dayKey = DAY_KEYS[i];
+					const dateStr = formatDateLocal(addDays(monday, i));
+					appendLog(`--- ${DAY_LABELS[dayKey]} ${dateStr} ---`);
+					const tpl = state.settings.weekTemplate[dayKey];
+					try {
+						validateDayTemplate(tpl);
+					} catch (e) {
+						appendLog(`Validation error (skipping): ${String(e.message || e)}`);
+						summary.failed++;
+						continue;
+					}
+
+					const segments = tpl.segments.filter((s) => s && s.enabled !== false && s.since && s.until);
+					let allOk = true;
+					if (!segments.length) {
+						appendLog('No enabled segments, skipping day.');
+						summary.skipped++;
+						continue;
+					}
+					for (const seg of segments) {
+						try {
+							await createEntry({
+								customerId: state.settings.customerId,
+								serviceId: state.settings.serviceId,
+								dateStr,
+								seg,
+							});
+							appendLog(`Created: ${seg.since}–${seg.until}`);
+						} catch (e) {
+							appendLog(`Failed: ${String(e.message || e)}`);
+							allOk = false;
+							break;
+						}
+						await sleep(250);
+					}
+
+					if (allOk) summary.booked++;
+					else summary.failed++;
+					await sleep(400);
+				}
+
+				appendLog(`Summary: booked=${summary.booked}, skipped=${summary.skipped}, failed=${summary.failed}`);
+				if (summary.booked > 0) {
+					appendLog('Refreshing booked times...');
+					await refreshBookedTimes({ preserveLog: true });
+				}
+			}
+
+			async function refreshBookedTimes({ preserveLog = false } = {}) {
+				if (!preserveLog) clearLog();
+				appendLog('Fetching booked work times (workTimes)...');
+				const ok = await ensureConnection();
+				if (!ok) return;
+				if (!state.me || !state.me.id) {
+					appendLog('Cannot fetch workTimes: missing user id.');
+					return;
+				}
+				const monday = getSelectedWeekMonday();
+				const dateSince = formatDateLocal(monday);
+				const dateUntil = formatDateLocal(addDays(monday, 4));
+				try {
+					const data = await fetchJson('/v2/workTimes', {
+						query: { date_since: dateSince, date_until: dateUntil, users_id: state.me.id, items_per_page: 1000, page: 1 },
+						retries: 1,
+					});
+					const days = Array.isArray(data.work_time_days) ? data.work_time_days : [];
+					state.bookedByDate = {};
+					for (const d of days) {
+						if (d && d.date) state.bookedByDate[d.date] = d;
+					}
+					appendLog(`Loaded workTimes for ${days.length} days.`);
+					applyOverlapSelectionsForCurrentWeek();
+					renderWeek();
+				} catch (e) {
+					appendLog(`Failed to fetch workTimes: ${String(e.message || e)}`);
+				}
+			}
+
+			function extractYearFromDateStr(dateStr) {
+				const p = parseDateInput(dateStr);
+				return p ? p.y : null;
+			}
+
+			async function refreshNonbusinessDaysForSelectedWeek({ preserveLog = true } = {}) {
+				if (!preserveLog) clearLog();
+				const monday = getSelectedWeekMonday();
+				const year = monday.getFullYear();
+				if (!state.me || !state.me.id) {
+					state.nonbusinessByDate = {};
+					renderWeek();
+					return;
+				}
+
+				if (!state.nonbusinessByYear[year]) {
+					try {
+						const data = await fetchJson('/v2/usersNonbusinessDays', {
+							query: {
+								'filter[users_id]': state.me.id,
+								year,
+								items_per_page: 100,
+								page: 1,
+							},
+							retries: 1,
+						});
+						const perDate = {};
+						const userRows = Array.isArray(data && data.data) ? data.data : [];
+						for (const userRow of userRows) {
+							const days = Array.isArray(userRow && userRow.days) ? userRow.days : [];
+							for (const day of days) {
+								const date = day && day.evaluated_date;
+								if (!date) continue;
+								if (!perDate[date]) perDate[date] = [];
+								perDate[date].push(day);
+							}
+						}
+						state.nonbusinessByYear[year] = perDate;
+					} catch (e) {
+						appendLog(`Failed to fetch usersNonbusinessDays: ${String(e.message || e)}`);
+						state.nonbusinessByYear[year] = {};
+					}
+				}
+
+				const weeklyDates = {};
+				for (let i = 0; i < DAY_KEYS.length; i++) {
+					const dateStr = formatDateLocal(addDays(monday, i));
+					const entries = state.nonbusinessByYear[year][dateStr] || [];
+					if (entries.length) weeklyDates[dateStr] = entries;
+				}
+				state.nonbusinessByDate = weeklyDates;
+				renderWeek();
+			}
+
+			function updateApiKeyLink() {
+				if (!el.apiKeyGetKeyLink) return;
+				if (el.apiKey.value.trim()) {
+					el.apiKeyGetKeyLink.classList.add('hidden');
+				} else {
+					el.apiKeyGetKeyLink.classList.remove('hidden');
+				}
+			}
+
+			function updateIdEditLinksVisibility() {
+				if (el.customerIdEditLink) {
+					el.customerIdEditLink.classList.toggle('hidden', !el.customerId.disabled);
+				}
+				if (el.serviceIdEditLink) {
+					el.serviceIdEditLink.classList.toggle('hidden', !el.serviceId.disabled);
+				}
+			}
+
+			function toggleIdFieldDisabled(inputEl, linkEl) {
+				if (!inputEl || !linkEl) return;
+				inputEl.disabled = !inputEl.disabled;
+				updateIdEditLinksVisibility();
+				if (!inputEl.disabled) {
+					inputEl.focus();
+					inputEl.select();
+				}
+			}
+
+			function syncSettingsToUI() {
+				const s = state.settings;
+				el.apiUser.value = s.apiUser || '';
+				el.apiKey.value = s.apiKey || '';
+				el.customerId.value = s.customerId ? String(s.customerId) : '';
+				el.serviceId.value = s.serviceId ? String(s.serviceId) : '';
+				el.customerId.disabled = true;
+				el.serviceId.disabled = true;
+				updateApiKeyLink();
+				updateIdEditLinksVisibility();
+			}
+
+			function syncUIToSettings() {
+				const next = Object.assign({}, state.settings);
+				next.apiUser = el.apiUser.value.trim();
+				next.apiKey = el.apiKey.value.trim();
+				next.customerId = el.customerId.value.trim();
+				next.serviceId = el.serviceId.value.trim();
+				saveSettings(next);
+			}
+
+			function initWeekOf() {
+				const today = new Date();
+				el.weekOf.value = formatDateLocal(today);
+			}
+
+			async function onSaveSettings() {
+				syncUIToSettings();
+				saveSettings(state.settings, true);
+				appendLog('Settings saved to localStorage.');
+				renderWeek();
+			}
+
+			function wireEvents() {
+				el.apiKey.addEventListener('input', updateApiKeyLink);
+				if (el.customerIdEditLink) {
+					el.customerIdEditLink.addEventListener('click', (ev) => {
+						ev.preventDefault();
+						toggleIdFieldDisabled(el.customerId, el.customerIdEditLink);
+					});
+				}
+				if (el.serviceIdEditLink) {
+					el.serviceIdEditLink.addEventListener('click', (ev) => {
+						ev.preventDefault();
+						toggleIdFieldDisabled(el.serviceId, el.serviceIdEditLink);
+					});
+				}
+				el.btnSaveSettings.addEventListener('click', onSaveSettings);
+				el.btnTestConnection.addEventListener('click', async () => {
+					syncUIToSettings();
+					clearLog();
+					await testConnection();
+				});
+				document.querySelectorAll('.card-cog-btn').forEach((btn) => {
+					btn.addEventListener('click', () => {
+						if (!el.connectionCard) return;
+						el.connectionCard.classList.toggle('hidden');
+					});
+				});
+				el.weekOf.addEventListener('change', async () => {
+					renderWeek();
+					await refreshNonbusinessDaysForSelectedWeek();
+					await refreshBookedTimes({ preserveLog: true });
+				});
+				el.btnBookWeek.addEventListener('click', () => bookWeek());
+				el.btnRefreshBooked.addEventListener('click', () => refreshBookedTimes());
+			}
+
+			async function bootstrap() {
+				state.settings = loadSettings();
+				syncSettingsToUI();
+				initWeekOf();
+				wireEvents();
+				renderWeek();
+
+				// Load current week's booked intervals on startup when creds are available.
+				if (state.settings.apiUser && state.settings.apiKey) {
+					try {
+						const connected = await ensureConnection();
+						if (connected && el.connectionCard) {
+							el.connectionCard.classList.toggle('hidden');
+						}
+						await refreshNonbusinessDaysForSelectedWeek();
+						await refreshBookedTimes();
+					} catch {
+						// already handled by refreshBookedTimes
+					}
+				}
+			}
+
+			bootstrap();
+		})();
+	</script>
+</body>
+
+</html>
